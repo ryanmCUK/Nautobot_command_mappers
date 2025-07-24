@@ -26,7 +26,7 @@ sync_devices:
     commands:
       - command: 'show ip'
         parser: "ttp"
-        jpath: "[*].interface[*].ip_address"
+        jpath: "[*].interface.ip_address"
         post_processor: "{{ obj | first if obj else none }}"
         iterable_type: "str"
 
@@ -35,7 +35,7 @@ sync_devices:
       - command: 'show ip'
         parser: "ttp"
         # CORRECT JPATH: 'ip_address' and 'subnet_mask' refer to fields from TextFSM output
-        jpath: "[*].interface[*].subnet_mask"
+        jpath: "[*].interface.subnet_mask"
         #post_processor: "{{ obj[0] }}"
         post_processor: "{{ obj | first | netmask_to_cidr if obj else none }}"
         iterable_type: "int"
