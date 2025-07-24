@@ -1,0 +1,12 @@
+<group name="ip_service">
+  Default Gateway : {{ default_gateway }}
+  Default TTL     : {{ default_ttl | to_int }}
+  Arp Age         : {{ arp_age | to_int }}
+  Domain Suffix   : {{ domain_suffix | default("") }}
+  DNS server      : {{ dns_server | default("") }}
+</group>
+
+<group name="interface" method="table">
+  {{ vlan_name }} | {{ ip_config }} {{ ip_address | IP }} {{ subnet_mask | IP }} {{ proxy_arp_std  }} {{ proxy_arp_local }}
+  {{ vlan_name }} | {{ ip_config }} {{ ip_address | IP }} {{ subnet_mask | IP }}
+</group>
