@@ -1,0 +1,41 @@
+---
+sync_devices:
+  # Hostname extraction
+  hostname:
+    commands:
+      - command: "show system"
+        # ProCurve often just outputs the hostname directly, no complex parsing needed
+        parser: "textfsm" # Use raw if no TextFSM/JSON parsing is needed.
+        jpath: "[*].name"  # When parser is raw, jpath should also be raw
+
+  # Serial Number extraction
+  serial:
+    commands:
+      - command: "show system"
+        parser: "textfsm" # Assuming you have a TextFSM template for 'show system-information'
+        jpath: "[*].serial"
+
+  ### Device Type / Model extraction
+  device_type:
+    commands:
+      - command: "show lldp info local-device"
+        parser: "textfsm"
+        jpath: "[*].system_description"
+
+  mgmt_interface:
+    commands:
+      - command: 'show ip'
+        parser: "ttp"
+        jpath: "[*].interface[*].ip_address"
+        post_processor: "{{ obj | first if obj else none }}"
+        iterable_type: "str"
+
+  mask_length:
+    commands:
+      - command: 'show ip'
+        parser: "ttp"
+        # CORRECT JPATH: 'ip_address' and 'subnet_mask' refer to fields from TextFSM output
+        jpath: "[*].interface[*].subnet_mask"
+        #post_processor: "{{ obj[0] }}"
+        post_processor: "{{ obj | first | netmask_to_cidr if obj else none }}"
+        iterable_type: "int"
